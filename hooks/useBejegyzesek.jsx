@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export function useBejegyzesek() {
   const [bejegyzesek, setBejegyzesek] = useState([]);
   const [loading, setLoading] = useState(true);
+  const kovetkezoId = useRef(4);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -25,6 +26,7 @@ export function useBejegyzesek() {
           id: '3',
           cim: 'Hétvégi pihenés',
           hely: 'Eger',
+          leiras: '',
           kedvenc: false,
         },
       ]);
@@ -34,25 +36,25 @@ export function useBejegyzesek() {
     return () => clearTimeout(timer);
   }, []);
 
-  const addBejegyzes = (cim, hely, leiras = '') => {
-    const ujElem = {
-      id: Date.now().toString(),
+  function addBejegyzes(cim, hely, leiras = '') {
+    const ujBejegyzes = {
+      id: String(kovetkezoId.current++),
       cim,
       hely,
       leiras,
       kedvenc: false,
     };
-    setBejegyzesek((b) => [...b, ujElem]);
-  };
 
-  const toggleKedvenc = (id) => {
-    setBejegyzesek((b) => b.map((item) => (item.id === id ? { ...item, kedvenc: !item.kedvenc } : item)));
-  };
+    setBejegyzesek((elozo) => [...elozo, ujBejegyzes]);
+  }
 
-  return {
-    bejegyzesek,
-    loading,
-    addBejegyzes,
-    toggleKedvenc,
-  };
+  function toggleKedvenc(id) {
+    setBejegyzesek((elozo) =>
+      elozo.map((item) =>
+        item.id === id ? { ...item, kedvenc: !item.kedvenc } : item
+      )
+    );
+  }
+
+  return { bejegyzesek, loading, addBejegyzes, toggleKedvenc };
 }
